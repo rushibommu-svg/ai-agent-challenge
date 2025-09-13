@@ -1,0 +1,55 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+env/
+venv/
+ENV/
+
+# Editor & OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Test / coverage
+.coverage
+.coverage.*
+.cache/
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+
+# Debug artifacts
+debug/*.csv
+
+# Logs
+*.log
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+*.manifest
+*.spec
+
+# Jupyter / notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Data artifacts (optional, keep only gold samples)
+*.tmp
+*.bak
+
+# Reports
+
+*.out
+
+# Node (if frontend or diagrams involved)
+node_modules/
