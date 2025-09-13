@@ -76,38 +76,43 @@ def locate_pdf(target: str) -> Path:
 
 def pretty_diff(got: pd.DataFrame, exp: pd.DataFrame, max_rows: int = 6) -> str:
     msgs: List[str] = []
+
     if list(got.columns) != list(exp.columns):
-        msgs.append(
-            "Column schema mismatch.\n"
-            f"  got: {list(got.columns)}\n"
-            f"  exp: {list(exp.columns)}"
-        )
+        msgs.append("Column schema mismatch.")
+        msgs.append(f"Expected: {list(exp.columns)}")
+        msgs.append(f"Got     : {list(got.columns)}")
         return "\n".join(msgs)
 
-    if len(got) != len(exp):
-        msgs.append(f"Row count mismatch: got {len(got)} vs exp {len(exp)}")
+    # Always show a concise shape summary first
+    msgs.append(f"Rows: got={len(got)} exp={len(exp)}; Cols={len(exp.columns)}")
 
+    if len(got) != len(exp):
+        msgs.append("Row count mismatch")
+
+    # Show first few per-cell diffs (same order, same columns at this point)
     diffs = []
-    for i in range(min(len(got), len(exp))):
-        rg = got.iloc[i]
-        rexp = exp.iloc[i]
-        for c in got.columns:
-            g, e = rg[c], rexp[c]
-            # Check if equal including NaN handling
-            if (pd.isna(g) and pd.isna(e)) or (g == e):
+    cols = list(exp.columns)
+    n = min(len(got), len(exp))
+    for i in range(n):
+        for c in cols:
+            gv = got.iloc[i][c]
+            ev = exp.iloc[i][c]
+            if pd.isna(gv) and pd.isna(ev):
                 continue
-            diffs.append((i, c, g, e))
-            if len(diffs) >= max_rows:
-                break
+            if gv != ev:
+                diffs.append((i, c, gv, ev))
+                if len(diffs) >= max_rows:
+                    break
         if len(diffs) >= max_rows:
             break
 
     if diffs:
         msgs.append("First diffs (row, col, got, exp):")
-        for (i, c, g, e) in diffs:
-            msgs.append(f"  ({i}, {c!r}): {g!r} != {e!r}")
+        for (i, c, gv, ev) in diffs:
+            msgs.append(f"  {i}, {c}: {gv!r} != {ev!r}")
 
-    return "\n".join(msgs) if msgs else "no visible diffs (but DataFrame.equals returned False)"
+    return "\n".join(msgs)
+
 
 # Code generation - write the actual parser
 def write_parser_file(target: str) -> Path:
@@ -364,7 +369,7 @@ def run_agent(cfg: AgentConfig) -> int:
         # Test it
         ok, got, exp, diff_text = compare_with_expected(target, verbose=cfg.verbose)
         if ok:
-            log("✅ Success: Parser output matches expected CSV exactly.")
+            log("**** Success: Parser output matches expected CSV exactly.")
             return 0
 
         # Try to fix it based on what went wrong
@@ -383,7 +388,7 @@ def run_agent(cfg: AgentConfig) -> int:
             write_parser_file(target)
             log("No fixes applied; regenerated parser. Retrying...")
 
-    log("❌ Failed to get exact match within max iterations.")
+    log("**** Failed to get exact match within max iterations.")
     return 1
 
 # Command line interface

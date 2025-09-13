@@ -104,9 +104,9 @@ pytest --cov=agent --cov=custom_parsers --cov-report=html -q
 
 ## Why This Matters
 
-* ✅ Automates tedious **financial data extraction** reliably
-* ✅ Handles **edge cases banks introduce** (locale quirks, Unicode, schema shifts)
-* ✅ Easily extensible to other structured PDFs (invoices, bills, forms)
+*  Automates tedious **financial data extraction** reliably
+*  Handles **edge cases banks introduce** (locale quirks, Unicode, schema shifts)
+*  Easily extensible to other structured PDFs (invoices, bills, forms)
 
 ---
 
@@ -127,7 +127,6 @@ Our test suite covers:
 ```bash
 # Verify coverage matches our results
 pytest --cov=agent --cov=custom_parsers --cov-report=term-missing -q
-# Expected: ~463 statements, ~48 missed, ~90% coverage
 ```
 
 ---
